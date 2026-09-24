@@ -1,0 +1,15 @@
+# build
+dist/
+.astro/
+.wrangler/
+
+# deps
+node_modules/
+
+# env
+.env
+.env.*
+
+# os
+.DS_Store
+

@@ -1,0 +1,43 @@
+---
+import Icon from "./Icon.astro";
+import { site } from "../data/site";
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap row">
+    <p>© {year} {site.name}</p>
+    <ul>
+      <li><a href="https://github.com/zacharyk812"><Icon name="github" size={14} />GitHub</a></li>
+      <li><a href="https://discord.com/users/293074588970254337"><Icon name="discord" size={14} />Discord</a></li>
+      <li><a href="/rss.xml"><Icon name="rss" size={14} />RSS</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-block: 2rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  ul {
+    display: flex;
+    gap: 1.25rem;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+</style>

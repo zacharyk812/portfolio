@@ -1,0 +1,116 @@
+---
+import { getPosts } from "../lib/posts";
+
+const path = Astro.url.pathname;
+const onHome = path === "/";
+const hasPosts = (await getPosts()).length > 0;
+const nav = [
+  { label: "Projects", href: "/#projects" },
+  { label: "Experience", href: "/#experience" },
+  ...(hasPosts ? [{ label: "Blog", href: "/blog" }] : []),
+];
+---
+
+<header class="header">
+  <div class="wrap bar">
+    <a class="home mono" href="/" aria-current={onHome ? "page" : undefined}>
+      <span class="tilde">~/</span>zacharyk812
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={item.href === "/blog" && path.startsWith("/blog") ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li><a class="cta" href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.header nav a[href^="/#"]')];
+  const sections = links
+    .map((a) => document.getElementById(a.hash.slice(1)))
+    .filter((s): s is HTMLElement => s !== null);
+
+  if (sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const a of links) {
+            if (a.hash === `#${entry.target.id}`) a.setAttribute("aria-current", "true");
+            else a.removeAttribute("aria-current");
+          }
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+    sections.forEach((s) => observer.observe(s));
+  }
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 3.75rem;
+  }
+  .home {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .tilde {
+    color: var(--accent);
+  }
+  ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2.5vw, 1.75rem);
+  }
+  nav a {
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  nav a:hover,
+  nav a[aria-current] {
+    color: var(--text);
+  }
+  .cta {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--text);
+    transition: border-color 0.2s var(--ease-out), color 0.2s var(--ease-out);
+  }
+  .cta:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  @media (max-width: 34rem) {
+    li:has(a[href="/#experience"]) {
+      display: none;
+    }
+  }
+</style>

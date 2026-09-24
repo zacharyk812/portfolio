@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+---
+
+<Base title="Not found">
+  <div class="wrap nf">
+    <p class="mono cmd"><span>$</span> cd {Astro.url.pathname}</p>
+    <p class="mono err">cd: no such file or directory</p>
+    <h1>This page doesn't exist.</h1>
+    <a href="/"><Icon name="arrow-left" size={14} />Back home</a>
+  </div>
+</Base>
+
+<style>
+  .nf {
+    min-height: 60vh;
+    padding-block: clamp(5rem, 3rem + 8vw, 10rem);
+  }
+  .cmd {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+  .cmd span {
+    color: var(--accent);
+  }
+  .err {
+    margin-top: 0.25rem;
+    color: #ff8a80;
+    font-size: 0.9375rem;
+  }
+  h1 {
+    margin-top: 2.5rem;
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
+    letter-spacing: -0.035em;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 2rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+</style>

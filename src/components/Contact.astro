@@ -1,0 +1,93 @@
+---
+import Icon from "./Icon.astro";
+import { links } from "../data/site";
+const email = links.find((l) => l.icon === "mail");
+const others = links.filter((l) => l !== email && !l.placeholder);
+---
+
+<section id="contact" class="contact wrap" aria-labelledby="contact-title">
+  <h2 id="contact-title">Have something to build?</h2>
+  <p>
+    Need a website, a Discord bot or a Minecraft server built? Send me an email or chat with me
+    on Discord.
+  </p>
+  <div class="actions">
+    {
+      email && !email.placeholder && (
+        <a class="primary" href={email.href}>
+          <Icon name="mail" />
+          {email.href.replace("mailto:", "")}
+        </a>
+      )
+    }
+    {
+      others.map((l) => (
+        <a class="secondary" href={l.href}>
+          <Icon name={l.icon} />
+          {l.label}
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-bottom: var(--space-section);
+  }
+  h2 {
+    max-width: 14ch;
+    font-size: clamp(2.5rem, 1.5rem + 4.5vw, 4.5rem);
+    letter-spacing: -0.04em;
+  }
+  p {
+    max-width: 52ch;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: var(--step-1);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out),
+      color 0.2s var(--ease-out);
+  }
+  .primary {
+    background: var(--accent-fill);
+    color: var(--accent-ink);
+  }
+  .primary:hover {
+    background: var(--accent-fill-hover);
+    color: var(--accent-ink);
+  }
+  .secondary {
+    border: 1px solid var(--line-strong);
+  }
+  .secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem;
+    color: var(--faint);
+    font-weight: 500;
+  }
+  .ghost .todo {
+    margin-left: 0;
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+import Section from "./Section.astro";
+import { experience, skills } from "../data/site";
+---
+
+<Section id="experience" title="Experience">
+  <ol class="jobs">
+    {
+      experience.map((job) => (
+        <li class:list={["job", { ghost: job.placeholder }]}>
+          <p class="period mono">{job.period}</p>
+          <div>
+            <h3>
+              {job.role} <span class="org">· {job.org}</span>
+              {job.placeholder && <span class="todo">TODO</span>}
+            </h3>
+            <p class="summary">{job.summary}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="skills">
+    <h3 class="skills-title">Skills</h3>
+    <dl>
+      {
+        skills.map((group) => (
+          <div class:list={["group", { ghost: group.placeholder }]}>
+            <dt class="mono">{group.label}</dt>
+            <dd>
+              {group.items.join(", ")}
+              {group.placeholder && <span class="todo">TODO</span>}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</Section>
+
+<style>
+  .jobs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .job {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 0.5rem 3rem;
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .period {
+    padding-top: 0.25rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  h3 {
+    font-size: var(--step-1);
+    letter-spacing: -0.015em;
+  }
+  .org {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .summary {
+    max-width: 62ch;
+    margin-top: 0.5rem;
+    color: var(--muted);
+  }
+
+  .ghost {
+    border-bottom-style: dashed;
+  }
+  .ghost h3,
+  .ghost dd {
+    color: var(--muted);
+  }
+  .ghost .org,
+  .ghost .summary {
+    color: var(--faint);
+  }
+
+  .skills {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: 0.5rem 3rem;
+    padding-top: 3.5rem;
+  }
+  .skills-title {
+    font-size: var(--step-1);
+  }
+  dl {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+  .group {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 1.5rem;
+    padding-block: 0.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .group:first-child {
+    padding-top: 0.25rem;
+  }
+  dt {
+    padding-top: 0.2rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  dd {
+    margin: 0;
+  }
+
+  @media (max-width: 40rem) {
+    .job,
+    .skills {
+      grid-template-columns: 1fr;
+    }
+    .group {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+</style>

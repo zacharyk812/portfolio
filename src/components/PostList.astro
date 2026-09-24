@@ -1,0 +1,82 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../lib/github";
+import { readingTime } from "../lib/reading-time";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+}
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 ? (
+    <ul class="posts">
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>
+            <time class="mono" datetime={post.data.date.toISOString()}>
+              {formatDate(post.data.date)}
+            </time>
+            <span class="title">
+              {post.data.title}
+              {post.data.draft && <span class="todo">DRAFT</span>}
+            </span>
+            <span class="read mono">{readingTime(post.body)} min read</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="empty">
+      Nothing published yet. Posts on plugins, tooling and whatever I'm building will land here.
+    </p>
+  )
+}
+
+<style>
+  li {
+    border-bottom: 1px solid var(--line);
+  }
+  a {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
+    grid-template-areas: "date title read";
+    gap: 0.25rem 3rem;
+    padding-block: 1.125rem;
+    text-decoration: none;
+  }
+  time {
+    grid-area: date;
+    padding-top: 0.2rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  .title {
+    grid-area: title;
+    font-weight: 500;
+  }
+  .read {
+    grid-area: read;
+    padding-top: 0.2rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+    white-space: nowrap;
+  }
+  a:hover .title {
+    color: var(--accent);
+  }
+  .empty {
+    padding-block: 2rem;
+    color: var(--muted);
+  }
+  @media (max-width: 40rem) {
+    a {
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        "date read"
+        "title title";
+      gap: 0.25rem 1.5rem;
+    }
+  }
+</style>

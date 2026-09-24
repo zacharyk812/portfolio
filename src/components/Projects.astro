@@ -1,0 +1,161 @@
+---
+import Section from "./Section.astro";
+import Icon from "./Icon.astro";
+import { projects, site } from "../data/site";
+import { getRepoStats, formatDate } from "../lib/github";
+
+const rows = await Promise.all(
+  projects.map(async (p) => ({ ...p, stats: await getRepoStats(p) }))
+);
+---
+
+<Section id="projects" title="Projects">
+  <a slot="aside" href={`https://github.com/${site.handle}?tab=repositories`}>
+    All repositories <Icon name="arrow-up-right" size={14} />
+  </a>
+
+  <ul class="list">
+    {
+      rows.map((p) => (
+        <li class="project">
+          <div class="main">
+            <h3>
+              <a href={p.href ?? p.stats.url}>
+                {p.name}
+                <Icon name="arrow-up-right" size={18} class="arrow" />
+              </a>
+            </h3>
+            <p class="summary">{p.summary}</p>
+            <ul class="details">
+              {p.details.map((d) => <li>{d}</li>)}
+            </ul>
+          </div>
+          <dl class="meta mono">
+            <div>
+              <dt>lang</dt>
+              <dd>{p.stats.language ?? "—"}</dd>
+            </div>
+            {p.stats.stars > 0 && (
+              <div>
+                <dt>stars</dt>
+                <dd>
+                  <Icon name="star" size={12} />
+                  {p.stats.stars}
+                </dd>
+              </div>
+            )}
+            {p.stats.updated && (
+              <div>
+                <dt>updated</dt>
+                <dd>
+                  <time datetime={p.stats.updated}>{formatDate(p.stats.updated)}</time>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </li>
+      ))
+    }
+  </ul>
+</Section>
+
+<style>
+  .project {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+    gap: 1.5rem 3rem;
+    padding-block: 2.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .project:last-child {
+    border-bottom: 0;
+  }
+  h3 {
+    font-size: var(--step-2);
+  }
+  h3 a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  /* Stretch the title link over the row so the whole project is clickable. */
+  h3 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  h3 :global(.arrow) {
+    color: var(--faint);
+    transition: transform 0.3s var(--ease-out), color 0.2s var(--ease-out);
+  }
+  .project:hover h3 a {
+    color: var(--accent);
+  }
+  .project:hover :global(.arrow),
+  h3 a:hover :global(.arrow) {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+  .summary {
+    max-width: 60ch;
+    margin-top: 0.75rem;
+    color: var(--muted);
+  }
+  .details {
+    display: grid;
+    gap: 0.375rem;
+    margin-top: 1.25rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+  .details li {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .details li::before {
+    content: "";
+    flex: none;
+    width: 0.75rem;
+    height: 1px;
+    margin-top: 0.8em;
+    background: var(--line-strong);
+  }
+
+  .meta {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    margin: 0;
+    padding-top: 0.5rem;
+    font-size: var(--step--1);
+  }
+  .meta div {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 1rem;
+  }
+  dt {
+    color: var(--faint);
+  }
+  dd {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--text);
+  }
+
+  @media (max-width: 48rem) {
+    .project {
+      grid-template-columns: 1fr;
+      padding-block: 2rem;
+    }
+    .meta {
+      padding-top: 0;
+    }
+  }
+</style>
