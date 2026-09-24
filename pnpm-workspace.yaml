@@ -1,4 +1,13 @@
+packages:
+  - "."
+
+# Dependencies allowed to run install scripts (pnpm 11+ reads allowBuilds,
+# older versions read onlyBuiltDependencies).
 allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd
