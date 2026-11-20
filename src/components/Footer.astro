@@ -8,6 +8,7 @@ const year = new Date().getFullYear();
   <div class="wrap row">
     <p>© {year} {site.name}</p>
     <ul>
+      <li><a href="https://xenastudios.co">Xena Studios</a></li>
       <li><a href="https://github.com/zacharyk812"><Icon name="github" size={14} />GitHub</a></li>
       <li><a href="https://discord.com/users/293074588970254337"><Icon name="discord" size={14} />Discord</a></li>
       <li><a href="/rss.xml"><Icon name="rss" size={14} />RSS</a></li>
@@ -31,7 +32,8 @@ const year = new Date().getFullYear();
   }
   ul {
     display: flex;
-    gap: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
   }
   a {
     display: inline-flex;

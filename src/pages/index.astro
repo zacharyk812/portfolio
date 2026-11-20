@@ -1,26 +1,36 @@
 ---
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
-import Projects from "../components/Projects.astro";
-import Experience from "../components/Experience.astro";
+import WorkGroups from "../components/WorkGroups.astro";
 import Section from "../components/Section.astro";
 import PostList from "../components/PostList.astro";
 import Contact from "../components/Contact.astro";
 import Icon from "../components/Icon.astro";
-import { getPosts } from "../lib/posts";
+import { getPosts, getWork } from "../lib/posts";
 
+const work = (await getWork()).filter((w) => w.data.featured);
 const posts = (await getPosts()).slice(0, 4);
 ---
 
 <Base>
   <Hero />
-  <Projects />
-  <Experience />
-  <Section id="blog" title="Blog">
-    {posts.length > 0 && (
-      <a slot="aside" href="/blog">All posts <Icon name="arrow-up-right" size={14} /></a>
-    )}
-    <PostList posts={posts} />
+  <Section id="work" title="Work">
+    <a slot="aside" href="/work">All work <Icon name="arrow-right" size={14} /></a>
+    <div class="work"><WorkGroups entries={work} /></div>
   </Section>
+  {
+    posts.length > 0 && (
+      <Section id="writing" title="Writing">
+        <a slot="aside" href="/writing">All posts <Icon name="arrow-right" size={14} /></a>
+        <PostList posts={posts} />
+      </Section>
+    )
+  }
   <Contact />
 </Base>
+
+<style>
+  .work {
+    padding-top: 2.5rem;
+  }
+</style>

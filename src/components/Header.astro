@@ -2,18 +2,18 @@
 import { getPosts } from "../lib/posts";
 
 const path = Astro.url.pathname;
-const onHome = path === "/";
 const hasPosts = (await getPosts()).length > 0;
+// Writing stays out of the menu until there is something to read.
 const nav = [
-  { label: "Projects", href: "/#projects" },
-  { label: "Experience", href: "/#experience" },
-  ...(hasPosts ? [{ label: "Blog", href: "/blog" }] : []),
+  { label: "Work", href: "/work" },
+  ...(hasPosts ? [{ label: "Writing", href: "/writing" }] : []),
+  { label: "About", href: "/about" },
 ];
 ---
 
 <header class="header">
   <div class="wrap bar">
-    <a class="home mono" href="/" aria-current={onHome ? "page" : undefined}>
+    <a class="home mono" href="/" aria-current={path === "/" ? "page" : undefined}>
       <span class="tilde">~/</span>zacharyk812
     </a>
     <nav aria-label="Main">
@@ -21,43 +21,17 @@ const nav = [
         {
           nav.map((item) => (
             <li>
-              <a
-                href={item.href}
-                aria-current={item.href === "/blog" && path.startsWith("/blog") ? "page" : undefined}
-              >
+              <a href={item.href} aria-current={path.startsWith(item.href) ? "page" : undefined}>
                 {item.label}
               </a>
             </li>
           ))
         }
-        <li><a class="cta" href="/#contact">Contact</a></li>
+        <li><a class="cta" href="/about#contact">Contact</a></li>
       </ul>
     </nav>
   </div>
 </header>
-
-<script>
-  const links = [...document.querySelectorAll<HTMLAnchorElement>('.header nav a[href^="/#"]')];
-  const sections = links
-    .map((a) => document.getElementById(a.hash.slice(1)))
-    .filter((s): s is HTMLElement => s !== null);
-
-  if (sections.length) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          for (const a of links) {
-            if (a.hash === `#${entry.target.id}`) a.setAttribute("aria-current", "true");
-            else a.removeAttribute("aria-current");
-          }
-        }
-      },
-      { rootMargin: "-40% 0px -55% 0px" }
-    );
-    sections.forEach((s) => observer.observe(s));
-  }
-</script>
 
 <style>
   .header {
@@ -86,7 +60,7 @@ const nav = [
   ul {
     display: flex;
     align-items: center;
-    gap: clamp(0.75rem, 2.5vw, 1.75rem);
+    gap: clamp(0.875rem, 2.5vw, 1.75rem);
   }
   nav a {
     font-size: 0.875rem;
@@ -108,9 +82,16 @@ const nav = [
     border-color: var(--accent);
     color: var(--accent);
   }
-  @media (max-width: 34rem) {
-    li:has(a[href="/#experience"]) {
-      display: none;
+  /* Tighten the bar on narrow phones so the menu fits on one line. */
+  @media (max-width: 26rem) {
+    .home {
+      font-size: 0.8125rem;
+    }
+    ul {
+      gap: 0.75rem;
+    }
+    .cta {
+      padding-inline: 0.625rem;
     }
   }
 </style>

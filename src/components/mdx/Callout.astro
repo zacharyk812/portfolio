@@ -1,0 +1,42 @@
+---
+// A boxed aside for something the reader needs even when skimming.
+interface Props {
+  type?: "note" | "warning";
+  title?: string;
+}
+const { type = "note", title = type === "warning" ? "Warning" : "Note" } = Astro.props;
+---
+
+<aside class:list={["callout", type]}>
+  <p class="label">{title}</p>
+  <div class="body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    padding: 1rem 1.25rem 1.125rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--bg-raised);
+  }
+  .label {
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .warning {
+    border-color: var(--warn-line);
+  }
+  .warning .label {
+    color: var(--warn);
+  }
+  .body {
+    margin-top: 0.375rem;
+    color: var(--prose);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+  .body :global(> * + *) {
+    margin-top: 0.75em;
+  }
+</style>

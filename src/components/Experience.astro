@@ -11,7 +11,10 @@ import { experience, skills } from "../data/site";
           <p class="period mono">{job.period}</p>
           <div>
             <h3>
-              {job.role} <span class="org">· {job.org}</span>
+              {job.role}{" "}
+              <span class="org">
+                · {job.href ? <a href={job.href}>{job.org}</a> : job.org}
+              </span>
               {job.placeholder && <span class="todo">TODO</span>}
             </h3>
             <p class="summary">{job.summary}</p>

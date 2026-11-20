@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security problem
+    url: https://github.com/zacharyk812/portfolio/security/advisories/new
+    about: Privately, so it can be fixed before it's public.
+  - name: Xena Studios projects
+    url: https://github.com/xena-studios
+    about: Bugs and ideas for Raptor, NeoSkript and the plugins go to their own repositories.
+  - name: Get in touch
+    url: https://zacharyk.dev/about#contact
+    about: Work, hiring, or anything that isn't a problem with the site.

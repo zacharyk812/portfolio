@@ -1,0 +1,135 @@
+/* Long-form text: work pages and posts. */
+.prose {
+  color: var(--prose);
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+.prose > * + * {
+  margin-top: 1.25em;
+}
+.prose h2 {
+  margin-top: 2.5em;
+  font-size: var(--step-2);
+  color: var(--text);
+}
+.prose h3 {
+  margin-top: 2em;
+  font-size: var(--step-1);
+  color: var(--text);
+}
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: 0.75em;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose a {
+  color: var(--accent);
+}
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.25em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose li::marker {
+  color: var(--faint);
+}
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg-raised);
+  font-size: 0.875em;
+}
+.prose pre {
+  padding: 1.125rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 1.25em;
+  border-left: 1px solid var(--line-strong);
+  color: var(--muted);
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: 3em;
+}
+.prose img {
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.prose kbd {
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font-size: 0.8125em;
+}
+
+/* Tables scroll sideways inside their own box instead of the page. */
+.prose table {
+  display: block;
+  width: 100%;
+  max-width: max-content;
+  border-collapse: collapse;
+  overflow-x: auto;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.prose th,
+.prose td {
+  padding: 0.625rem 1.5rem 0.625rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.prose th {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.prose td:first-child {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Diagrams: the source shows as text until the drawing replaces it. */
+.prose pre:has(> code.language-mermaid) {
+  color: var(--faint);
+}
+.prose .diagram {
+  margin-inline: 0;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  overflow-x: auto;
+}
+.prose .diagram svg {
+  max-width: none;
+  margin-inline: auto;
+}
+/* The site has no shadows; drop the ones the diagram library adds. */
+.prose .diagram svg * {
+  filter: none !important;
+}
