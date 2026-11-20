@@ -1,13 +1,26 @@
 ---
 import Icon from "./Icon.astro";
-import { site, links, projects } from "../data/site";
+import { site, links } from "../data/site";
+import { getPosts, getWork } from "../lib/posts";
+
+const featured = (await getWork()).filter((w) => w.data.featured && w.data.org === "xena");
+const [latest] = await getPosts();
+
+// Directory listings wrap like `ls` does, a few names to a line.
+const columns = 3;
+const names = featured.map((w) => `${w.id}/`);
+const listing = Array.from({ length: Math.ceil(names.length / columns) }, (_, i) =>
+  names.slice(i * columns, i * columns + columns).join("  ")
+);
 
 // Shell transcript shown beside the intro. Each command types in once on
 // load; everything is plain text and fully visible without JS.
 const session = [
-  { cmd: "whoami", out: [`${site.name.toLowerCase()} · ${site.role.toLowerCase()}`] },
-  { cmd: "ls ~/projects", out: [projects.map((p) => `${p.name}/`).join("  ")] },
-  { cmd: "echo $LOCATION", out: [site.location] },
+  { cmd: "whoami", out: [`${site.name.toLowerCase()} · ${site.title.toLowerCase()}`] },
+  { cmd: "ls ~/work/xena-studios", out: listing },
+  latest
+    ? { cmd: "ls -t ~/writing | head -1", out: [`${latest.id}.md`] }
+    : { cmd: "echo $LOCATION", out: [site.location] },
 ];
 
 let t = 0.35;
@@ -24,11 +37,17 @@ const caretDelay = t;
 <section class="hero wrap" aria-labelledby="hero-title">
   <div class="intro">
     <h1 id="hero-title">{site.name}</h1>
-    <p class="role">{site.role}</p>
+    <p class="role">{site.tagline}</p>
     <div class="bio">
       {site.bio.map((p) => <p>{p}</p>)}
     </div>
     <ul class="links">
+      <li>
+        <a class="primary" href="/work">
+          See my work
+          <Icon name="arrow-right" />
+        </a>
+      </li>
       {
         links.map((l) => (
           <li>
@@ -39,7 +58,7 @@ const caretDelay = t;
                 <span class="todo">TODO</span>
               </span>
             ) : (
-              <a href={l.href} class:list={{ primary: l.label === "GitHub" }}>
+              <a href={l.href}>
                 <Icon name={l.icon} />
                 {l.label}
               </a>
@@ -94,8 +113,11 @@ const caretDelay = t;
     line-height: 0.95;
   }
   .role {
-    margin-top: 1rem;
+    max-width: 24ch;
+    margin-top: 1.25rem;
     font-size: var(--step-2);
+    line-height: 1.25;
+    text-wrap: balance;
     font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--muted);

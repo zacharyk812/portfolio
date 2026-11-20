@@ -1,13 +1,7 @@
-packages:
-  - "."
-
-# Dependencies allowed to run install scripts (pnpm 11+ reads allowBuilds,
-# older versions read onlyBuiltDependencies).
+# Dependencies allowed to run install scripts (pnpm runs none by default):
+# esbuild and workerd fetch their platform binaries for Astro and Wrangler,
+# and sharp builds the image optimiser Astro uses.
 allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - workerd

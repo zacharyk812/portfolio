@@ -1,0 +1,44 @@
+---
+import Base from "../../../layouts/Base.astro";
+import PostList from "../../../components/PostList.astro";
+import Icon from "../../../components/Icon.astro";
+import { getPosts, getTags } from "../../../lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return (await getTags()).map(([tag]) => ({
+    params: { tag },
+    props: { posts: posts.filter((post) => post.data.tags.includes(tag)) },
+  }));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<Base title={`#${tag}`} description={`Posts tagged ${tag}.`}>
+  <div class="wrap page">
+    <a class="back" href="/writing"><Icon name="arrow-left" size={14} />All posts</a>
+    <h1 class="mono">#{tag}</h1>
+    <PostList posts={posts} />
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem) var(--space-section);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  h1 {
+    margin: 2.5rem 0 2rem;
+    font-size: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+    letter-spacing: -0.03em;
+  }
+</style>

@@ -1,0 +1,41 @@
+name: Site problem
+description: Something on zacharyk.dev is broken, wrong or hard to use.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. This repository is the website only: problems with Raptor, NeoSkript or the plugins go to their own repositories (the link is on the previous page). For a security problem, don't use this form: report it privately from the previous page.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page's address, with the section if there is one.
+      placeholder: https://zacharyk.dev/work/raptor
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem
+      options:
+        - Something doesn't display or work right
+        - Something is wrong or out of date
+        - A broken link
+        - Hard to use with a keyboard, screen reader or zoom
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What's wrong
+      description: What you saw, and what you expected. A screenshot helps for anything visual.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      description: For display problems.
+      placeholder: Safari on iPhone 15, iOS 26

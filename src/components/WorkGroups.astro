@@ -1,0 +1,204 @@
+---
+// Work entries listed under the group they belong to (the studio first,
+// then independent projects). Used on the home page and on /work.
+import type { CollectionEntry } from "astro:content";
+import Icon from "./Icon.astro";
+import { orgs } from "../data/site";
+import { getRepoStats, formatDate } from "../lib/github";
+
+interface Props {
+  entries: CollectionEntry<"work">[];
+  level?: 2 | 3; // heading level of the group names
+}
+const { entries, level = 3 } = Astro.props;
+const GroupTitle = `h${level}` as const;
+const RowTitle = (level === 2 ? "h3" : "h4") as "h3" | "h4";
+
+const rows = await Promise.all(
+  entries.map(async (entry) => ({
+    entry,
+    stats: entry.data.repo ? await getRepoStats(entry.data.repo, entry.data.stack[0]) : null,
+  }))
+);
+const groups = (Object.keys(orgs) as (keyof typeof orgs)[])
+  .map((key) => ({ ...orgs[key], rows: rows.filter((r) => r.entry.data.org === key) }))
+  .filter((group) => group.rows.length > 0);
+---
+
+<div class="groups">
+  {
+    groups.map((group) => (
+      <section class="group">
+        <div class="group-head">
+          <GroupTitle class="group-title">{group.name}</GroupTitle>
+          {group.href && (
+            <a class="out" href={group.href}>
+              {group.linkLabel} <Icon name="arrow-up-right" size={14} />
+            </a>
+          )}
+          <p>{group.description}</p>
+        </div>
+        <ul>
+          {group.rows.map(({ entry, stats }) => (
+            <li class="row">
+              <div class="main">
+                <RowTitle class="row-title">
+                  <a href={`/work/${entry.id}/`}>
+                    {entry.data.title}
+                    <Icon name="arrow-right" size={16} class="arrow" />
+                  </a>
+                  {entry.data.draft && <span class="todo">DRAFT</span>}
+                </RowTitle>
+                <p class="summary">{entry.data.summary}</p>
+              </div>
+              <dl class="meta mono">
+                <div>
+                  <dt>type</dt>
+                  <dd>{entry.data.kind}</dd>
+                </div>
+                <div>
+                  <dt>status</dt>
+                  <dd>{entry.data.status}</dd>
+                </div>
+                {stats?.release ? (
+                  <div>
+                    <dt>release</dt>
+                    <dd>{stats.release}</dd>
+                  </div>
+                ) : (
+                  stats?.updated && (
+                    <div>
+                      <dt>updated</dt>
+                      <dd>
+                        <time datetime={stats.updated}>{formatDate(stats.updated)}</time>
+                      </dd>
+                    </div>
+                  )
+                )}
+              </dl>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .groups {
+    display: grid;
+    gap: 4.5rem;
+  }
+  .group-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0.75rem 2rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .group-head :global(.group-title) {
+    font-size: var(--step-2);
+  }
+  .group-head p {
+    grid-column: 1 / -1;
+    max-width: 60ch;
+    color: var(--muted);
+  }
+  .out {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+    gap: 1rem 3rem;
+    padding-block: 1.75rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .row :global(.row-title) {
+    font-size: var(--step-1);
+    letter-spacing: -0.015em;
+  }
+  .row :global(.row-title a) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  /* Stretch the title link over the row so the whole row is clickable. */
+  .row :global(.row-title a)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .row :global(.arrow) {
+    color: var(--faint);
+    transition: transform 0.3s var(--ease-out), color 0.2s var(--ease-out);
+  }
+  .row:hover :global(.row-title a) {
+    color: var(--accent);
+  }
+  .row:hover :global(.arrow) {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+  .summary {
+    max-width: 58ch;
+    margin-top: 0.5rem;
+    color: var(--muted);
+  }
+
+  .meta {
+    display: grid;
+    align-content: start;
+    gap: 0.375rem;
+    margin: 0;
+    padding-top: 0.3rem;
+    font-size: var(--step--1);
+  }
+  .meta div {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1rem;
+  }
+  dt {
+    color: var(--faint);
+  }
+  dd {
+    margin: 0;
+    color: var(--text);
+  }
+
+  @media (max-width: 48rem) {
+    .groups {
+      gap: 3.5rem;
+    }
+    .row {
+      grid-template-columns: 1fr;
+      padding-block: 1.5rem;
+    }
+    .meta {
+      grid-auto-flow: column;
+      justify-content: start;
+      gap: 1.25rem;
+      padding-top: 0;
+    }
+    .meta div {
+      display: block;
+    }
+    .meta dt {
+      display: none;
+    }
+    .meta dd {
+      color: var(--faint);
+    }
+  }
+</style>

@@ -11,6 +11,9 @@
   --text: #e8ebf2;
   --muted: #a4abba;
   --faint: #7c8496;
+  --prose: #d0d5df;
+  --warn: #e8b563;
+  --warn-line: #57462a;
   /* Deep blue carries fills (buttons, selection); its light tint carries
      text-sized marks (prompt, hover, focus) where the deep blue would
      be too dark to read on the ground. */
@@ -83,7 +86,8 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   margin: 0;
   font-weight: 600;
   line-height: 1.1;

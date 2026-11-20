@@ -1,7 +1,7 @@
 ---
 // Small stroke icons, drawn on a 16px grid at a 1.5 stroke.
 interface Props {
-  name: "arrow-up-right" | "arrow-left" | "star" | "github" | "mail" | "discord" | "rss";
+  name: "arrow-up-right" | "arrow-left" | "arrow-right" | "star" | "github" | "mail" | "discord" | "rss";
   size?: number;
   class?: string;
 }
@@ -28,6 +28,7 @@ const { name, size = 16, class: className } = Astro.props;
 >
   {name === "arrow-up-right" && <path d="M5 11 11 5M6 5h5v5" />}
   {name === "arrow-left" && <path d="M13 8H3M7 4 3 8l4 4" />}
+  {name === "arrow-right" && <path d="M3 8h10M9 4l4 4-4 4" />}
   {name === "star" && (
     <path d="m8 2.2 1.75 3.55 3.92.57-2.84 2.77.67 3.9L8 11.15 4.5 12.99l.67-3.9L2.33 6.32l3.92-.57L8 2.2Z" />
   )}

@@ -1,0 +1,143 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Article from "../../components/Article.astro";
+import PostList from "../../components/PostList.astro";
+import Icon from "../../components/Icon.astro";
+import { orgs } from "../../data/site";
+import { getWork, getPostsFor } from "../../lib/posts";
+import { getRepoStats, formatDate } from "../../lib/github";
+
+export async function getStaticPaths() {
+  const work = await getWork();
+  return work.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+const stats = data.repo ? await getRepoStats(data.repo, data.stack[0]) : null;
+const posts = await getPostsFor(entry.id);
+
+const facts = [
+  { label: "For", value: data.org === "xena" ? orgs.xena.name : null },
+  { label: "Role", value: data.role },
+  { label: "Status", value: data.status },
+  { label: "When", value: data.period },
+  { label: "Built with", value: data.stack.join(", ") },
+  { label: "Release", value: stats?.release },
+  { label: "Last commit", value: stats?.updated ? formatDate(stats.updated) : null },
+].filter((fact) => fact.value);
+
+const links = [...data.links, ...(stats ? [{ label: "Source", href: stats.url }] : [])];
+---
+
+<Base title={data.title} description={data.summary}>
+  <Article
+    title={data.title}
+    lede={data.summary}
+    back={{ href: "/work", label: "All work" }}
+    headings={headings}
+    draft={data.draft}
+  >
+    <Fragment slot="meta">
+      <dl class="facts">
+        {
+          facts.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      {
+        links.length > 0 && (
+          <ul class="links">
+            {links.map((link, i) => (
+              <li>
+                <a class:list={{ primary: i === 0 }} href={link.href}>
+                  {link.label === "Source" && <Icon name="github" />}
+                  {link.label}
+                  {link.label !== "Source" && <Icon name="arrow-up-right" size={14} />}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </Fragment>
+
+    <Content />
+
+    {
+      posts.length > 0 && (
+        <section slot="after" class="log" aria-labelledby="log-title">
+          <h2 id="log-title">Build log</h2>
+          <PostList posts={posts} />
+        </section>
+      )
+    }
+  </Article>
+</Base>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, max-content));
+    gap: 1.25rem 3.5rem;
+    margin: 2.25rem 0 0;
+  }
+  dt {
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  dd {
+    margin: 0.125rem 0 0;
+    font-weight: 500;
+  }
+  dd::first-letter {
+    text-transform: uppercase;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5625rem 1.125rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out),
+      color 0.2s var(--ease-out);
+  }
+  .links a:hover {
+    border-color: var(--accent);
+  }
+  .links a.primary {
+    border-color: var(--accent-fill);
+    background: var(--accent-fill);
+    color: var(--accent-ink);
+  }
+  .links a.primary:hover {
+    border-color: var(--accent-fill-hover);
+    background: var(--accent-fill-hover);
+  }
+
+  .log {
+    margin-top: 5rem;
+  }
+  .log h2 {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--step-3);
+  }
+</style>

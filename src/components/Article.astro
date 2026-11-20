@@ -1,0 +1,220 @@
+---
+// Shared frame for long-form pages (work entries and posts): a header,
+// the text at a readable measure, and a table of contents beside it.
+import type { MarkdownHeading } from "astro";
+import Icon from "./Icon.astro";
+import "../styles/prose.css";
+
+interface Props {
+  title: string;
+  lede?: string;
+  back: { href: string; label: string };
+  headings?: MarkdownHeading[];
+  draft?: boolean;
+}
+const { title, lede, back, headings = [], draft = false } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = toc.filter((h) => h.depth === 2).length >= 3;
+---
+
+<article class="wrap article">
+  <a class="back" href={back.href}><Icon name="arrow-left" size={14} />{back.label}</a>
+  <header>
+    <h1>{title}{draft && <span class="todo">DRAFT</span>}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    <slot name="meta" />
+  </header>
+  <div class:list={["body", { "has-toc": showToc }]}>
+    <div class="prose">
+      <slot />
+    </div>
+    {
+      showToc && (
+        <nav class="toc" aria-label="On this page">
+          <p>On this page</p>
+          <ul>
+            {toc.map((h) => (
+              <li class:list={{ sub: h.depth === 3 }}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </div>
+  <slot name="after" />
+</article>
+
+<script>
+  // Diagrams: draw ```mermaid blocks with the site's own colours. The
+  // library is only downloaded on pages that have one.
+  async function drawDiagrams() {
+    const blocks = [...document.querySelectorAll<HTMLElement>("pre > code.language-mermaid")];
+    if (blocks.length === 0) return;
+
+    const { default: mermaid } = await import("mermaid");
+    const root = getComputedStyle(document.documentElement);
+    const token = (name: string) => root.getPropertyValue(name).trim();
+    const text = token("--text");
+    const muted = token("--muted");
+    const line = token("--line-strong");
+    const ground = token("--bg");
+    const raised = token("--bg-raised");
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "base",
+      fontFamily: token("--font-sans"),
+      // Draw at natural size; a wide diagram scrolls inside its frame
+      // instead of shrinking until the labels are unreadable.
+      flowchart: { useMaxWidth: false },
+      sequence: { useMaxWidth: false },
+      themeVariables: {
+        fontSize: "14px",
+        background: raised,
+        primaryColor: ground,
+        primaryTextColor: text,
+        primaryBorderColor: line,
+        secondaryColor: raised,
+        secondaryTextColor: text,
+        secondaryBorderColor: line,
+        tertiaryColor: raised,
+        tertiaryTextColor: muted,
+        tertiaryBorderColor: line,
+        lineColor: token("--faint"),
+        textColor: muted,
+        mainBkg: ground,
+        edgeLabelBackground: raised,
+        clusterBkg: raised,
+        clusterBorder: line,
+        titleColor: text,
+        actorBkg: ground,
+        actorBorder: line,
+        actorTextColor: text,
+        actorLineColor: line,
+        signalColor: muted,
+        signalTextColor: text,
+        labelBoxBkgColor: ground,
+        labelBoxBorderColor: line,
+        labelTextColor: text,
+        loopTextColor: muted,
+        noteBkgColor: raised,
+        noteBorderColor: line,
+        noteTextColor: muted,
+        activationBkgColor: raised,
+        activationBorderColor: line,
+      },
+    });
+
+    for (const [i, code] of blocks.entries()) {
+      try {
+        const { svg } = await mermaid.render(`diagram-${i}`, code.textContent ?? "");
+        const figure = document.createElement("figure");
+        figure.className = "diagram";
+        figure.innerHTML = svg;
+        code.parentElement?.replaceWith(figure);
+      } catch {
+        // A diagram that fails to parse stays visible as its source.
+      }
+    }
+  }
+  drawDiagrams();
+
+  // Table of contents: mark the section being read.
+  const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>(".toc a")];
+  if (tocLinks.length > 0) {
+    const byId = new Map(tocLinks.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const a of tocLinks) a.removeAttribute("aria-current");
+          byId.get(entry.target.id)?.setAttribute("aria-current", "true");
+        }
+      },
+      { rootMargin: "-15% 0px -75% 0px" }
+    );
+    for (const id of byId.keys()) {
+      const heading = document.getElementById(id);
+      if (heading) observer.observe(heading);
+    }
+  }
+</script>
+
+<style>
+  .article {
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem) var(--space-section);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  header {
+    margin: 2.5rem 0 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 {
+    max-width: 22ch;
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
+    letter-spacing: -0.035em;
+  }
+  .lede {
+    max-width: 44rem;
+    margin-top: 1.25rem;
+    color: var(--muted);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+
+  .prose {
+    max-width: var(--measure);
+  }
+  .toc {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .has-toc {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure)) 14rem;
+      justify-content: space-between;
+      gap: 4rem;
+      align-items: start;
+    }
+    .toc {
+      display: block;
+      position: sticky;
+      top: 6rem;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+      font-size: 0.875rem;
+    }
+  }
+  .toc p {
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  .toc ul {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.875rem;
+  }
+  .toc .sub {
+    padding-left: 0.875rem;
+  }
+  .toc a {
+    display: block;
+    color: var(--muted);
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .toc a:hover,
+  .toc a[aria-current] {
+    color: var(--text);
+  }
+</style>

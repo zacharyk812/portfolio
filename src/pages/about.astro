@@ -1,0 +1,60 @@
+---
+import Base from "../layouts/Base.astro";
+import Experience from "../components/Experience.astro";
+import Contact from "../components/Contact.astro";
+import { site, orgs } from "../data/site";
+---
+
+<Base title="About" description={site.description}>
+  <div class="wrap intro">
+    <h1>About</h1>
+    <div class="bio">
+      <p>
+        I'm {site.name}, a full-stack developer in the {site.location}. I run{" "}
+        <a href={orgs.xena.href}>Xena Studios</a>, where I build the software that runs game
+        servers, the plugins that run on them, and Minecraft servers of its own.
+      </p>
+      <p>
+        I started out running Minecraft servers for other people: leading development, keeping
+        the infrastructure up, and writing the plugins the servers needed. That is still the work
+        I like most, and the studio is where I do it now. <a href="/work">My work</a> covers what
+        I've built there and on my own.
+      </p>
+      <p>
+        Most of what I build is in Go and Java on Linux, with TypeScript for the web. A lot of it
+        is infrastructure that never becomes a repo, so I write about how it works and why I built
+        it that way.
+      </p>
+    </div>
+  </div>
+  <Experience />
+  <Contact />
+</Base>
+
+<style>
+  .intro {
+    padding-block: clamp(4rem, 3rem + 5vw, 7rem) var(--space-section);
+  }
+  h1 {
+    font-size: clamp(2.75rem, 1.75rem + 4vw, 4.5rem);
+    letter-spacing: -0.04em;
+  }
+  .bio {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 40rem;
+    margin-top: 2rem;
+    color: var(--muted);
+    font-size: var(--step-1);
+    line-height: 1.55;
+  }
+  .bio p:first-child {
+    color: var(--text);
+  }
+  .bio a {
+    color: var(--text);
+  }
+  .bio a:hover {
+    color: var(--accent);
+  }
+</style>

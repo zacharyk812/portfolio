@@ -1,9 +1,17 @@
+// zacharyk.dev: the Astro build (dist/) as a Cloudflare Worker with static
+// assets only, no Worker code. Headers are in public/_headers and redirects
+// in public/_redirects.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "portfolio",
-  "compatibility_date": "2026-09-01",
+  "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
-  }
+  },
+  // Only the custom domain (zacharyk.dev, attached once by hand): no
+  // workers.dev or preview addresses, and the deploy token never needs DNS access.
+  "workers_dev": false,
+  "preview_urls": false
 }

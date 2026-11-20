@@ -6,14 +6,14 @@ import { site } from "../data/site";
 export async function GET(context: APIContext) {
   const posts = await getPosts();
   return rss({
-    title: `${site.name}'s blog`,
+    title: `${site.name}'s writing`,
     description: site.description,
     site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.date,
-      link: `/blog/${post.id}/`,
+      link: `/writing/${post.id}/`,
     })),
   });
 }

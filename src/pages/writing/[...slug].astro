@@ -1,0 +1,103 @@
+---
+import { getEntry, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Article from "../../components/Article.astro";
+import { getPosts } from "../../lib/posts";
+import { formatDate } from "../../lib/github";
+import { readingTime } from "../../lib/reading-time";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content, headings } = await render(post);
+const project = data.project ? await getEntry(data.project) : null;
+---
+
+<Base
+  title={data.title}
+  description={data.description}
+  article={{ published: data.date, updated: data.updated, tags: data.tags }}
+>
+  <Article
+    title={data.title}
+    lede={data.description}
+    back={{ href: "/writing", label: "All posts" }}
+    headings={headings}
+    draft={data.draft}
+  >
+    <Fragment slot="meta">
+      <p class="meta mono">
+        <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime(post.body)} min read</span>
+        {
+          data.updated && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>
+                updated <time datetime={data.updated.toISOString()}>{formatDate(data.updated)}</time>
+              </span>
+            </>
+          )
+        }
+      </p>
+      {
+        (project || data.tags.length > 0) && (
+          <ul class="tags mono">
+            {project && (
+              <li>
+                <a class="project" href={`/work/${project.id}/`}>{project.data.title}</a>
+              </li>
+            )}
+            {data.tags.map((tag) => (
+              <li>
+                <a href={`/writing/tags/${tag}/`}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </Fragment>
+
+    <Content />
+  </Article>
+</Base>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.625rem;
+    margin-top: 1.75rem;
+    color: var(--faint);
+    font-size: var(--step--1);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: var(--step--1);
+  }
+  .tags a {
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .tags a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tags .project {
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+</style>

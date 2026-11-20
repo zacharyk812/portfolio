@@ -1,0 +1,71 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostList from "../../components/PostList.astro";
+import { getPosts, getTags } from "../../lib/posts";
+
+const posts = await getPosts();
+const tags = await getTags();
+const lede =
+  "Notes on what I'm building and why I built it that way: server software, infrastructure, homelab and security projects.";
+---
+
+<Base title="Writing" description={lede}>
+  <div class="wrap page">
+    <h1>Writing</h1>
+    <p class="lede">{lede}</p>
+    {
+      tags.length > 1 && (
+        <ul class="tags mono" aria-label="Topics">
+          {tags.map(([tag, count]) => (
+            <li>
+              <a href={`/writing/tags/${tag}/`}>
+                #{tag} <span>{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <PostList posts={posts} />
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-block: clamp(4rem, 3rem + 5vw, 7rem) var(--space-section);
+  }
+  h1 {
+    font-size: clamp(2.75rem, 1.75rem + 4vw, 4.5rem);
+    letter-spacing: -0.04em;
+  }
+  .lede {
+    max-width: 40rem;
+    margin: 1.25rem 0 3rem;
+    color: var(--muted);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: var(--step--1);
+  }
+  .tags a {
+    display: inline-flex;
+    gap: 0.4rem;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .tags a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .tags span {
+    color: var(--faint);
+  }
+</style>
